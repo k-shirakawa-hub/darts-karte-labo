@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Darts Karte LABO β Web Ver3.1.0</title>
+<title>Darts Karte LABO β Web Ver3.2.0</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--line:#d7dbe0;--text:#111827;--muted:#6b7280;--brand:#1f4fd8;--soft:#eef3ff;--danger:#b91c1c}
+:root{--bg:#f6f7f9;--card:#fff;--line:#d7dbe0;--text:#111827;--muted:#6b7280;--brand:#1f4fd8;--soft:#eef3ff;--danger:#b91c1c;--warn:#fff7ed}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.55}
 .app{max-width:920px;margin:0 auto;padding:14px 12px 96px}
@@ -18,6 +18,7 @@ h1{font-size:22px;margin:0 0 8px;text-align:center}
 .btn.danger{color:var(--danger)}
 .section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .section h2{font-size:18px;margin:0 0 10px;border-left:5px solid var(--brand);padding-left:9px}
+.notice{background:var(--warn);border:1px solid #fed7aa;border-radius:14px;padding:12px;margin:12px 0}
 .help{font-size:14px;color:var(--muted);margin:4px 0 12px}
 .grid{display:grid;grid-template-columns:1fr;gap:10px}
 .row{display:grid;grid-template-columns:1fr;gap:5px}
@@ -33,7 +34,7 @@ textarea{min-height:92px;resize:vertical}
 .report{background:#fff;padding:18px;border-radius:14px;border:1px solid var(--line)}
 .report h2{border:none;padding:0}
 .divider{border-top:1px solid var(--line);margin:14px 0}
-.toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;display:none;z-index:99}
+.toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 14px;border-radius:999px;display:none;z-index:99;max-width:90%;text-align:center}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:100}
 .modal .box{background:#fff;border-radius:18px 18px 0 0;padding:18px;max-height:82vh;overflow:auto;width:100%}
 .modal h2{margin-top:0}
@@ -43,27 +44,35 @@ textarea{min-height:92px;resize:vertical}
 .preview .meta{font-size:13px;color:var(--muted);margin-top:6px}
 .hidden{display:none!important}
 @media (min-width:760px){.grid{grid-template-columns:1fr 1fr}.row.full{grid-column:1/-1}.modal{align-items:center}.modal .box{max-width:720px;margin:auto;border-radius:18px}.nav{grid-template-columns:repeat(6,1fr)}}
-@media print{body{background:#fff}.top,.footerbar,.btn,.modal,.toast,.no-print{display:none!important}.app{padding:0;max-width:none}.section{break-inside:avoid;border:none;box-shadow:none}.report{border:none}img{break-inside:avoid;page-break-inside:avoid}}
+@media print{body{background:#fff}.top,.footerbar,.btn,.modal,.toast,.notice,.no-print{display:none!important}.app{padding:0;max-width:none}.section{break-inside:avoid;border:none;box-shadow:none}.report{border:none}img{break-inside:avoid;page-break-inside:avoid}}
 </style>
 </head>
 <body>
 
 <div class="top"><div class="app" style="padding-bottom:8px">
-<h1>ダーツカルテLABO β Web<br>Ver3.1.0</h1>
+<h1>ダーツカルテLABO β Web<br>Ver3.2.0</h1>
 <div class="nav">
 <button class="btn soft" onclick="showHelp()">使い方</button>
 <button class="btn" onclick="showSection('form')">入力</button>
 <button class="btn" onclick="showSection('history')">履歴</button>
 <button class="btn" onclick="showSection('report')">PDF</button>
-<button class="btn" onclick="exportCSV()">CSV</button>
+<button class="btn" onclick="showSection('backup')">CSV</button>
 <button class="btn danger" onclick="clearForm()">クリア</button>
 </div>
 </div></div>
 
 <div class="app">
+
+<div id="browserNotice" class="notice hidden">
+<b>外部ブラウザ推奨</b><br>
+LINE内ブラウザではPDF保存・CSV保存が正常に動かない場合があります。<br>
+右下メニューからChrome/Safariなどの外部ブラウザで開いてください。<br>
+<span class="small">※ブラウザを変えると保存履歴は引き継がれません。CSVバックアップ→CSV読込で移行できます。</span>
+</div>
+
 <section id="form" class="view">
 
-<div class="section"><h2>基本情報</h2><p class="help">β版：分かる範囲だけ入力して保存できます。</p><div class="grid">
+<div class="section"><h2>基本情報</h2><p class="help">モニター配布用β版です。保存データはこの端末・このブラウザ内に保存されます。</p><div class="grid">
 <div class="row"><label>受講者名</label><input id="name" placeholder="例：白川"></div>
 <div class="row"><label>ユーザーID</label><div class="two"><input id="userId" placeholder="自動発行可"><button class="btn" onclick="getOrCreateId(true)">ID取得</button></div></div>
 <div class="row"><label>実施日</label><input id="date" type="date"></div>
@@ -85,7 +94,7 @@ textarea{min-height:92px;resize:vertical}
 <div class="row full"><label>セッティングメモ</label><textarea id="settingMemo"></textarea></div>
 </div></div>
 
-<div class="section"><h2>アワード分析（手入力）</h2><div class="grid">
+<div class="section"><h2>アワード分析（手入力）</h2><p class="help">画像は保存できます。数値の自動読取は今後実装予定です。</p><div class="grid">
 <div class="row"><label>BULL総数</label><input id="bull" inputmode="numeric" oninput="updateCalc()"></div>
 <div class="row"><label>インナーBULL数</label><input id="innerBull" inputmode="numeric" oninput="updateCalc()"></div>
 <div class="row"><label>LOWTON数</label><input id="lowton" inputmode="numeric" oninput="updateCalc()"></div>
@@ -127,7 +136,7 @@ textarea{min-height:92px;resize:vertical}
 
 <section id="history" class="view hidden"><div class="section">
 <h2>保存履歴</h2>
-<p class="help">履歴から開いた後、PDF・CSVに反映できます。</p>
+<p class="help">この端末・このブラウザ内の履歴です。別ブラウザへ移す場合はCSVバックアップを使ってください。</p>
 <div id="historyList"></div>
 </div></section>
 
@@ -137,6 +146,37 @@ textarea{min-height:92px;resize:vertical}
 <button class="btn primary no-print" onclick="printReport()">PDF保存 / 印刷</button>
 <div id="reportBox" class="report" style="margin-top:12px"></div>
 </div></section>
+
+<section id="backup" class="view hidden"><div class="section">
+<h2>CSVバックアップ</h2>
+<p class="help">モニター利用中は、定期的にCSV出力してください。ブラウザ変更・機種変更時はCSV読込で復元できます。</p>
+
+<div class="notice">
+<b>重要</b><br>
+保存履歴はクラウドではなく、端末内ブラウザに保存されています。<br>
+LINEブラウザとChromeでは保存場所が別になります。
+</div>
+
+<div class="grid">
+<div class="row">
+<label>CSV出力</label>
+<button class="btn primary" onclick="exportCSV()">保存履歴をCSV出力</button>
+<p class="small">現在の保存履歴をバックアップします。</p>
+</div>
+
+<div class="row">
+<label>CSV読込</label>
+<input id="csvImport" type="file" accept=".csv,text/csv" onchange="importCSVFile()">
+<p class="small">過去に出力したCSVを読み込み、履歴へ追加します。</p>
+</div>
+
+<div class="row full">
+<button class="btn danger" onclick="deleteAllRecords()">保存履歴を全削除</button>
+<p class="small">テスト終了時やデータを消したい場合のみ使用してください。</p>
+</div>
+</div>
+</div></section>
+
 </div>
 
 <div class="footerbar"><div class="inner">
@@ -149,18 +189,20 @@ textarea{min-height:92px;resize:vertical}
 
 <div id="modal" class="modal"><div class="box">
 <h2>かんたん使い方ガイド</h2>
-<p><span class="pill">STEP1</span> 受講者名を入力して「ID取得」を押します。</p>
-<p><span class="pill">STEP2</span> 分かる範囲で基本情報・アワード数を入力します。</p>
-<p><span class="pill">STEP3</span> 「AI総評」を押します。</p>
-<p><span class="pill">STEP4</span> 「保存」で端末内に記録します。</p>
-<p><span class="pill">STEP5</span> 「履歴」から過去記録を開けます。</p>
-<p><span class="pill">STEP6</span> 「PDF」「CSV」で出力できます。</p>
-<p class="small">※画像はこの端末のブラウザ内に保存されます。</p>
+<p><span class="pill">STEP1</span> Chrome/Safariなどの外部ブラウザで開きます。</p>
+<p><span class="pill">STEP2</span> 受講者名を入力して「ID取得」を押します。</p>
+<p><span class="pill">STEP3</span> 分かる範囲で基本情報・アワード数を入力します。</p>
+<p><span class="pill">STEP4</span> 画像を添付し、必要に応じてAI総評を作成します。</p>
+<p><span class="pill">STEP5</span> 「保存」で端末内に記録します。</p>
+<p><span class="pill">STEP6</span> 「履歴」から過去記録を開けます。</p>
+<p><span class="pill">STEP7</span> 「CSV」からバックアップできます。</p>
+<p class="small">※β版です。データはこの端末・このブラウザ内に保存されます。</p>
 <button class="btn primary" onclick="closeHelp()">OK</button>
 </div></div>
 
 <script>
 const LS_KEY='dkl_web_records_v1';
+const APP_VERSION='3.2.0';
 const ids=['name','userId','date','ratingType','rating','stat01','statCri','targetRating','deadline','goalMemo','barrel','shaft','flight','tip','weight','settingMemo','bull','innerBull','lowton','hat','ton180','c5','c6','c7','c8','c9','wh','bed','problem','throwStyle','mainIssue','priority','feel','repro','unstable','nextObs','practice','nextTask','memo','aiSummary','studentSummary','liveImageData','liveImageName','phoenixImageData','phoenixImageName'];
 
 function today(){return new Date().toISOString().slice(0,10)}
@@ -171,10 +213,21 @@ function setv(id,v){document.getElementById(id).value=v??''}
 function num(id){const v=parseFloat(val(id).replace(/,/g,''));return isNaN(v)?0:v}
 function records(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]')}catch{return[]}}
 function saveAll(r){localStorage.setItem(LS_KEY,JSON.stringify(r))}
-function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',1800)}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2200)}
+
+function isLineBrowser(){
+ const ua=navigator.userAgent.toLowerCase();
+ return ua.includes('line');
+}
+
+function checkBrowser(){
+ if(isLineBrowser()){
+  document.getElementById('browserNotice').classList.remove('hidden');
+ }
+}
 
 function getForm(){
- const o={recordId:crypto.randomUUID(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),appVersion:'3.1.0'};
+ const o={recordId:crypto.randomUUID(),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),appVersion:APP_VERSION};
  ids.forEach(id=>o[id]=val(id));
  Object.assign(o,calc());
  return o;
@@ -212,7 +265,7 @@ function showImagePreview(dataId,previewId,nameId){
  if(!box)return;
  if(!data){box.classList.add('hidden');box.innerHTML='';return}
  box.classList.remove('hidden');
- box.innerHTML=`<img src="${data}" alt="保存画像"><div class="meta">保存画像：${name||'画像'}<br>※この端末のブラウザ内に保存されます。</div><button class="btn" type="button" onclick="clearImage('${dataId}','${nameId}','${previewId}')">画像を削除</button>`;
+ box.innerHTML=`<img src="${data}" alt="保存画像"><div class="meta">保存画像：${esc(name||'画像')}<br>※この端末のブラウザ内に保存されます。</div><button class="btn" type="button" onclick="clearImage('${dataId}','${nameId}','${previewId}')">画像を削除</button>`;
 }
 
 function clearImage(dataId,nameId,previewId){
@@ -298,10 +351,11 @@ function saveRecord(){
  saveAll(rs);
  renderHistory();
  renderReport();
- toast('保存しました');
+ toast('保存しました。履歴とCSVバックアップを確認してください');
 }
 
 function clearForm(){
+ if(!confirm('入力中の内容をクリアします。保存履歴は消えません。よろしいですか？'))return;
  ids.forEach(id=>setv(id,''));
  setv('date',today());
  setv('ratingType','ライブ');
@@ -309,6 +363,17 @@ function clearForm(){
  refreshImagePreviews();
  renderReport();
  toast('入力をクリアしました');
+}
+
+function deleteAllRecords(){
+ const ok1=confirm('保存履歴を全て削除します。元に戻せません。よろしいですか？');
+ if(!ok1)return;
+ const ok2=confirm('本当に全削除しますか？必要なら先にCSV出力してください。');
+ if(!ok2)return;
+ localStorage.removeItem(LS_KEY);
+ renderHistory();
+ renderReport();
+ toast('保存履歴を全削除しました');
 }
 
 function showSection(id){
@@ -331,8 +396,8 @@ function renderHistory(){
  const box=document.getElementById('historyList');
  if(!rs.length){box.innerHTML='<p>まだ保存履歴がありません。</p>';return}
  box.innerHTML=rs.map(r=>`<div class="section">
- <b>${r.date||''} ${r.name||''}</b><br>
- <span class="small">${r.userId||''} / HAT率 ${r.hatRate||'0.0'}% / CRICKET指数 ${r.scoreCricket||'0'} / 画像 ${r.liveImageData||r.phoenixImageData?'有':'無'}</span><br>
+ <b>${esc(r.date||'')} ${esc(r.name||'')}</b><br>
+ <span class="small">${esc(r.userId||'')} / HAT率 ${esc(r.hatRate||'0.0')}% / CRICKET指数 ${esc(r.scoreCricket||'0')} / 画像 ${r.liveImageData||r.phoenixImageData?'有':'無'}</span><br>
  <button class="btn" onclick='loadForm(${safeJson(r)})'>この記録を開く</button>
  </div>`).join('');
 }
@@ -369,13 +434,13 @@ function renderReport(){
  <h3>受講者向け総評</h3><p>${br(r.studentSummary)}</p>
 
  <h3>観察・練習記録</h3>
- <p>悩み・課題：${br(r.problem)}<br>主な課題：${br(r.mainIssue)}<br>練習メニュー：${br(r.practice)}<br>次回までの課題：${br(r.nextTask)}<br>メモ：${br(r.memo)}</p>
+ <p>悩み・課題：${br(r.problem)}<br>現在の投げ方：${br(r.throwStyle)}<br>主な課題：${br(r.mainIssue)}<br>優先修正ポイント：${br(r.priority)}<br>本人が投げやすい感覚：${br(r.feel)}<br>再現性が高かった動き：${br(r.repro)}<br>崩れやすい動き：${br(r.unstable)}<br>練習メニュー：${br(r.practice)}<br>次回までの課題：${br(r.nextTask)}<br>メモ：${br(r.memo)}</p>
 
  <h3>保存画像</h3>
  <p>ダーツライブ：${esc(r.liveImageName||'未選択')}<br>フェニックス：${esc(r.phoenixImageName||'未選択')}</p>
  ${r.liveImageData?`<img src="${r.liveImageData}" style="max-width:100%;max-height:420px;object-fit:contain;border:1px solid #ddd;border-radius:10px;margin-bottom:10px">`:''}
  ${r.phoenixImageData?`<img src="${r.phoenixImageData}" style="max-width:100%;max-height:420px;object-fit:contain;border:1px solid #ddd;border-radius:10px;margin-bottom:10px">`:''}
- <p class="small">Darts Karte LABO β Web / Ver3.1.0</p>`;
+ <p class="small">Darts Karte LABO β Web / Ver3.2.0</p>`;
 }
 
 function printReport(){
@@ -412,6 +477,75 @@ function downloadCSV(blob,fileName){
  toast('CSVを出力しました');
 }
 
+function parseCSV(text){
+ text=text.replace(/^\uFEFF/,'');
+ const rows=[];
+ let row=[],cell='',inQuotes=false;
+ for(let i=0;i<text.length;i++){
+  const ch=text[i],next=text[i+1];
+  if(inQuotes){
+   if(ch==='"'&&next==='"'){cell+='"';i++;}
+   else if(ch==='"'){inQuotes=false;}
+   else{cell+=ch;}
+  }else{
+   if(ch==='"'){inQuotes=true;}
+   else if(ch===','){row.push(cell);cell='';}
+   else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell='';}
+   else if(ch==='\r'){}
+   else{cell+=ch;}
+  }
+ }
+ if(cell!==''||row.length){row.push(cell);rows.push(row);}
+ return rows;
+}
+
+function importCSVFile(){
+ const input=document.getElementById('csvImport');
+ const file=input.files&&input.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const rows=parseCSV(reader.result);
+   if(rows.length<2){toast('CSVデータが空です');return}
+   const headers=rows[0];
+   const imported=rows.slice(1).map(row=>{
+    const o={};
+    headers.forEach((h,i)=>o[h]=row[i]??'');
+    if(!o.recordId)o.recordId=crypto.randomUUID();
+    if(!o.createdAt)o.createdAt=new Date().toISOString();
+    o.updatedAt=new Date().toISOString();
+    o.appVersion=o.appVersion||APP_VERSION;
+    return o;
+   }).filter(o=>o.name||o.userId||o.date);
+
+   if(!imported.length){toast('読み込めるデータがありません');return}
+
+   const current=records();
+   const existingIds=new Set(current.map(r=>r.recordId).filter(Boolean));
+   const merged=[...current];
+   let added=0;
+
+   imported.forEach(r=>{
+    if(r.recordId&&existingIds.has(r.recordId))return;
+    merged.push(r);
+    added++;
+   });
+
+   if(added===0){toast('新しく追加される履歴はありませんでした');return}
+   saveAll(merged);
+   renderHistory();
+   toast(`${added}件の履歴を読み込みました`);
+   input.value='';
+  }catch(e){
+   toast('CSV読込に失敗しました');
+  }
+ };
+ reader.onerror=()=>toast('CSV読込に失敗しました');
+ reader.readAsText(file,'utf-8');
+}
+
+checkBrowser();
 updateCalc();
 refreshImagePreviews();
 renderHistory();
